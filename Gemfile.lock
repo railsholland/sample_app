@@ -28,6 +28,7 @@ GEM
       activemodel (= 3.0.1)
       activesupport (= 3.0.1)
     activesupport (3.0.1)
+    annotate-models (1.0.4)
     arel (1.0.1)
       activesupport (~> 3.0.0)
     builder (2.1.2)
@@ -74,7 +75,6 @@ GEM
       rspec-expectations (~> 2.0.1)
     rspec-rails (2.0.1)
       rspec (~> 2.0.0)
-    spork (0.8.4)
     sqlite3-ruby (1.2.5)
     thor (0.14.6)
     treetop (1.4.9)
@@ -89,9 +89,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  annotate-models (= 1.0.4)
   rails
   rspec (= 2.0.1)
   rspec-rails (= 2.0.1)
-  spork
   sqlite3-ruby (= 1.2.5)
   webrat (= 0.7.1)
