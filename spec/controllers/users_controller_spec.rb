@@ -116,7 +116,6 @@ describe UsersController do
   			get :new
   			response.should have_selector("input[name='user[password_confirmation]'][type='password']")
   		end
-
   	end
   	
   	describe "Post 'create'" do
@@ -289,13 +288,33 @@ describe UsersController do
 				response.should redirect_to(root_path)
 			end
 		end
+		
+		
 	end		
+	
+	describe "authentication for create and new actions" do
+		# I wrote this test - see pg. 409. Can consider how to refactor.
+		before(:each) do
+			user_to_sign_in = Factory(:user)
+			test_sign_in(user_to_sign_in)
+		end
+			
+  		it "should not allow a signed-in user to create a new user" do
+			get :new	
+			response.should redirect_to(root_path)
+  		end
+  		
+  		it "should not allow a signed-in user to call the create controller" do
+			get :create
+			response.should redirect_to(root_path)
+  		end
+  	end
 	
 	describe "DELETE 'destroy'" do
 	
 		before(:each) do
 			@user = Factory(:user)
-		end
+		end		
 		
 		describe "as a non-signed-in user" do
 			it "should deny access" do
@@ -309,14 +328,28 @@ describe UsersController do
 				test_sign_in(@user)
 				delete :destroy, :id => @user
 				response.should redirect_to(root_path)
-			end		
+			end	
+
+			# next test 100% Holland code, see pg. 409
+			it "should not show delete links for a non-admin user" do
+				test_sign_in(@user)				
+				get :index
+				response.should_not have_selector("a", :content => "delete"	)					
+			end			
+				
 		end
 		
 		describe "as an admin user" do
 		
 			before(:each) do
-				admin = Factory(:user, :email => "admin@example.com", :admin => true)
-				test_sign_in(admin)
+				@admin = Factory(:user, :email => "admin@example.com", :admin => true)
+				test_sign_in(@admin)
+			end
+			
+			# next test 100% Holland code, see pg. 409
+			it "should show delete links on the users page" do
+				get :index
+				response.should have_selector("a", :content => "delete"	)							
 			end
 			
 			it "should destroy the user" do
@@ -329,6 +362,13 @@ describe UsersController do
 				delete :destroy, :id => @user
 				response.should redirect_to(users_path)
 			end
+
+			#this test - 100% Holland code, pg. 409. Note: had to make admin an instance variable, ie: @admin
+			it "should not allow admin user to destroy her/himself" do
+				lambda do
+					delete :destroy, :id => @admin
+				end.should_not change(User, :count)	
+			end					
 		end
 	end	
 end

@@ -1,8 +1,9 @@
 class UsersController < ApplicationController
 
-	before_filter	:authenticate, :only => [:index, :edit, :update, :destroy]
-	before_filter	:correct_user, :only => [:edit, :update]
-	before_filter	:admin_user,		:only => :destroy
+	before_filter	:authenticate, 		:only => [:index, :edit, :update, :destroy]
+	before_filter	:correct_user,			:only => [:edit, :update]
+	before_filter	:admin_user,			:only => :destroy
+	before_filter	:not_signed_in_user,	:only => [:new, :create] #100% Holland code, and it works!
 	
 	def index
 		@title = "All users"
@@ -34,9 +35,15 @@ class UsersController < ApplicationController
 	end
 	
 	def destroy
-		User.find(params[:id]).destroy
-		flash[:success] = "User destroyed."
-		redirect_to users_path
+		#add code here to make sure admin can't destroy himself, pg. 409
+		if User.find(params[:id]) == current_user
+			flash[:error] = "Admin user cannot delete self."
+			redirect_to users_path
+		else		
+			User.find(params[:id]).destroy
+			flash[:success] = "User destroyed."
+			redirect_to users_path
+		end
 	end
 	
 	def edit
@@ -67,5 +74,9 @@ class UsersController < ApplicationController
 		
 		def admin_user
 			redirect_to(root_path) unless current_user.admin?
+		end
+		
+		def not_signed_in_user
+			redirect_to(root_path) unless !signed_in?	
 		end
 end
