@@ -38,4 +38,25 @@ describe "Microposts" do
 			end
 		end
 	end	
+	
+	# This section of tests is a little messy. Need to think through them better. 100% added by me (Holland).
+	describe "when viewing other users' microposts the user" do
+	
+		before(:each) do
+			@user2 = Factory(:user, :email => Factory.next(:email))
+			mp3 = Factory(:micropost, :user => @user2, :created_at => 1.day.ago)
+		end		
+		
+		it "should see the posts of other users on their profile page" do	
+			visit user_path(@user2.id)		
+			response.should have_selector("td.micropost")
+		end	
+	
+		it "should not see a delete link next to a micropost that does not belong to current user" do
+			#code added to make sure delete link disappears appropriately, see pg. 458
+			visit user_path(@user2.id)		
+			response.should_not have_selector("a", :content => "delete")	
+		end		
+	end
 end
+

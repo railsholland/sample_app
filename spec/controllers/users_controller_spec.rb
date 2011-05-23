@@ -90,7 +90,15 @@ describe UsersController do
 			get	:show,	:id => @user
 			response.should have_selector("span.content", :content => mp1.content)
 			response.should have_selector("span.content", :content => mp2.content)
-		end		
+		end	
+		
+		it "should not show a delete link on the profile if the user is not signed in" do			
+				
+			user2 = Factory(:user, :email => Factory.next(:email))
+			mp3 = Factory(:micropost, :user => user2, :created_at => 1.day.ago)
+			get	:show,	:id => user2	
+			response.should_not have_selector("a", :content => "delete")	
+		end	
 	end
 
   	describe "GET 'new'" do
